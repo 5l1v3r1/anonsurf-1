@@ -129,7 +129,7 @@ function start {
 
 	mv /etc/resolv.conf /etc/resolv.conf.bak
 	echo -e 'nameserver 127.0.0.1' > /etc/resolv.conf
-	echo -e " $GREEN*$BLUE Modified resolv.conf to use Tor and ParrotDNS/OpenNIC\n"
+	echo -e " $GREEN*$BLUE Modified resolv.conf to use Tor\n"
 
 	# disable ipv6
 	echo -e " $GREEN*$BLUE Disabling IPv6 for security reasons\n"
@@ -200,7 +200,11 @@ function stop {
 	fi
 	echo -e -n "\n $GREEN*$BLUE Restore DNS service"
 	rm /etc/resolv.conf || true
-	ln -s /etc/resolvconf/run/resolv.conf /etc/resolv.conf || true
+	if ! [ -f /etc/resolv.conf.bak ]; then
+		ln -s /run/resolvconf/resolv.conf /etc/resolv.conf
+	else
+		cp /etc/resolv.conf.bak /etc/resolv.conf || true
+	fi
 
 	# re-enable ipv6
 	/sbin/sysctl -w net.ipv6.conf.all.disable_ipv6=0
@@ -241,9 +245,7 @@ function dnsstart {
     echo "Configuring OpenNIC DNS service"
     notify "Configuring OpenNIC DNS service"
     rm /etc/resolv.conf
-    cat /etc/anonsurf/resolv.conf.opennic > /etc/resolvconf/resolv.conf.d/tail
     cat /etc/anonsurf/resolv.conf.opennic > /etc/resolv.conf
-    /usr/sbin/service resolvconf restart
     touch /etc/anonsurf/opennic.lock
     echo "done"
     notify "done"
@@ -253,9 +255,7 @@ function dnsstop {
     echo "Deconfiguring OpenNIC DNS service"
     notify "Deconfiguring OpenNIC DNS service"
     rm /etc/resolv.conf
-    ln -s /etc/resolvconf/run/resolv.conf /etc/resolv.conf
-    echo > /etc/resolvconf/resolv.conf.d/tail
-    /usr/sbin/service resolvconf restart
+    ln -s /run/resolvconf/resolv.conf /etc/resolv.conf
     rm /etc/anonsurf/opennic.lock
     echo "done"
     notify "done"
@@ -299,7 +299,7 @@ case "$1" in
 	;;
    *)
 echo -e "
-Parrot AnonSurf Module (v 2.10)
+Parrot AnonSurf Module (v 2.11)
 	Developed by Lorenzo \"Palinuro\" Faletra <palinuro@parrotsec.org>
 		     Lisetta \"Sheireen\" Ferrero <sheireen@parrotsec.org>
 		     Francesco \"Mibofra\" Bonanno <mibofra@parrotsec.org>

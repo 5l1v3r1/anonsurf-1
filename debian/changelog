@@ -1,3 +1,9 @@
+anonsurf (2.11+parrot1) rolling-testing; urgency=medium
+
+  * Fix resolvconf paths.
+
+ -- Lorenzo "Palinuro" Faletra <palinuro@parrotsec.org>  Mon, 10 Feb 2020 23:25:08 +0100
+
 anonsurf (2.10+parrot3) testing; urgency=medium
 
   * Disable dhcp dns addresses when in opennic mode.
